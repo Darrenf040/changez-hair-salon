@@ -2,9 +2,13 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { FiMenu, FiX } from 'react-icons/fi'
+import { usePathname } from 'next/navigation'
+import clsx from "clsx"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const path = usePathname();
+  console.log(path)
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -29,14 +33,20 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-600 hover:text-primary transition-colors"
+                className={clsx(
+                  "hover:text-accent transition-colors",
+                  path === link.href ? "text-accent font-semibold" : "text-gray-600"
+                )}
               >
                 {link.label}
               </Link>
             ))}
             <Link
               href="/book"
-              className="bg-accent text-white px-4 py-1.5 rounded-lg hover:bg-opacity-90 transition-colors"
+              className={clsx(
+                "bg-primary px-4 py-1.5 rounded-lg hover:bg-opacity-90 transition-colors",
+                path === '/book' ? "text-accent text-semibold" : "text-white"
+              )}
             >
               Book Appointment
             </Link>
@@ -62,7 +72,10 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-3 py-2 text-gray-600 hover:text-primary transition-colors"
+                className={clsx(
+                  "block px-3 py-2 hover:text-accent transition-colors",
+                  path === link.href ? "text-accent font-semibold" : "text-gray-600"
+                )}
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
@@ -70,7 +83,10 @@ export default function Navbar() {
             ))}
             <Link
               href="/book"
-              className="block px-3 py-2 bg-accent text-white rounded-lg hover:bg-opacity-90 transition-colors mt-2"
+              className={clsx(
+                "block px-3 py-2 bg-primary rounded-lg hover:bg-opacity-90 transition-colors mt-2",
+                path === '/book' ? "text-accent text-semibold" : "text-white"
+              )}
               onClick={() => setIsOpen(false)}
             >
               Book Appointment

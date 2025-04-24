@@ -1,10 +1,11 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { FiScissors, FiDroplet, FiStar, FiTrendingUp, FiClock } from 'react-icons/fi'
+import { FiScissors, FiDroplet, FiStar, FiTrendingUp, FiClock, FiChevronDown } from 'react-icons/fi'
 
 export default function ServiceTabs() {
   const [activeTab, setActiveTab] = useState('Haircuts')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const tabs = [
     { id: 'Haircuts', icon: <FiScissors className="w-5 h-5" /> },
@@ -96,17 +97,22 @@ export default function ServiceTabs() {
     ],
   }
 
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId)
+    setIsDropdownOpen(false)
+  }
+
   return (
     <div className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-center mb-4">Welcome to Elegance</h1>
+        <h1 className="text-4xl font-bold text-center mb-4">Welcome to Changez Salon</h1>
         <p className="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
           Where artistry meets expertise. Our team of passionate stylists is dedicated to helping
           you look and feel your best with personalized hair services tailored to your unique style.
         </p>
 
-        {/* Tabs */}
-        <div className="flex justify-center space-x-4 mb-12">
+        {/* Desktop Tabs */}
+        <div className="hidden md:flex justify-center space-x-4 mb-12">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -123,8 +129,41 @@ export default function ServiceTabs() {
           ))}
         </div>
 
+        {/* Mobile Dropdown */}
+        <div className="md:hidden mb-8">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full flex items-center justify-between px-6 py-3 bg-white border border-gray-200 rounded-lg shadow-sm"
+          >
+            <div className="flex items-center space-x-2">
+              {tabs.find(tab => tab.id === activeTab)?.icon}
+              <span>{activeTab}</span>
+            </div>
+            <FiChevronDown className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {isDropdownOpen && (
+            <div className="absolute z-10 mt-2 w-[calc(100%-2rem)] bg-white border border-gray-200 rounded-lg shadow-lg">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`w-full flex items-center space-x-2 px-6 py-3 transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-primary text-white'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {tab.icon}
+                  <span>{tab.id}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Service Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services[activeTab].map((service, index) => (
             <div
               key={index}

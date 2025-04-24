@@ -44,7 +44,7 @@ export default function HeroCarousel() {
           Transform Your Style
         </h1>
         <p className="text-xl md:text-2xl mb-8 max-w-2xl animate-fade-in-delay">
-          Experience the art of beauty at Elegant Hair, where every visit leaves you feeling renewed and confident.
+          Experience the art of beauty at Changez Hair Salon, where every visit leaves you feeling renewed and confident.
         </p>
         <div className="space-x-4 animate-fade-in-delay-2">
           <Link

@@ -5,9 +5,9 @@ export default function Footer() {
   return (
     <footer className="bg-primary text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="flex flex-col md:flex-row md:justify-between gap-8">
           {/* Contact Info */}
-          <div className='w-max'>
+          <div className='w-max order-3'>
             <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
             <div className="space-y-3">
               <div className="flex items-center">
@@ -48,7 +48,7 @@ export default function Footer() {
           </div>
 
           {/* Hours */}
-          <div>
+          <div className='w-max'>
             <h3 className="text-xl font-semibold mb-4">Hours</h3>
             <div className="space-y-2">
               <p>Sunday: Closed</p>
@@ -59,7 +59,7 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className='w-max'>
             <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li><a href="/services" className="hover:text-accent transition-colors">Services</a></li>
@@ -71,7 +71,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-gray-600 text-center">
-          <p>&copy; {new Date().getFullYear()} ChangezSalon. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Changez Salon. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -31,25 +31,25 @@ export default function Contact() {
     {
       icon: <FiPhone className="w-6 h-6" />,
       title: "Phone",
-      info: "(555) 123-4567",
-      link: "tel:+15551234567"
+      info: "(832) 731-8833",
+      link: "tel:+8327318833"
     },
     {
       icon: <FiMail className="w-6 h-6" />,
       title: "Email",
-      info: "info@eleganthair.com",
-      link: "mailto:info@eleganthair.com"
+      info: "mamjane69@yahoo.com",
+      link: "mailto:mamjane69@yahoo.com"
     },
     {
       icon: <FiMapPin className="w-6 h-6" />,
       title: "Location",
-      info: "123 Style Street, Beauty City",
-      link: "https://maps.google.com"
+      info: "38 Wilson Rd suite a, Humble, TX 77338",
+      link: "https://maps.app.goo.gl/UUd9kETeHVoLPDsp9"
     },
     {
       icon: <FiClock className="w-6 h-6" />,
       title: "Hours",
-      info: "Mon-Fri: 9am-8pm, Sat: 9am-6pm",
+      info: "Tue-Fri: 8 AM-6 PM, Sat: 7 AM-4 PM",
       link: null
     }
   ]
