@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation'
 import clsx from "clsx"
 
 export default function Navbar() {
+
   const [isOpen, setIsOpen] = useState(false)
   const path = usePathname();
-  console.log(path)
 
   const navLinks = [
     { href: '/', label: 'Home' },

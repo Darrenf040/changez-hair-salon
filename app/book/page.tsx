@@ -1,0 +1,308 @@
+"use client"
+
+import { useEffect, useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import { FiChevronLeft, FiChevronRight, FiClock } from 'react-icons/fi';
+import { Hours } from '../types/hours';
+import BookingForm from '../components/BookingForm';
+import { BookedAppointments } from '../types/appointments';
+
+export default function BookingPage() {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [selectedTime, setSelectedTime] = useState<string | null>(null);
+    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [salonHours, setSalonHours] = useState<Hours[]>([]);
+    const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+    const [showBookingForm, setShowBookingForm] = useState(false);
+
+    useEffect(() => {
+        const fetchSalonHours = async () => {
+            try {
+                const { data, error } = await supabase.from("hours").select("*");
+                if (data) {
+                    setSalonHours(data);
+                }
+                if (error) throw error;
+            } catch (error) {
+                console.error("Error fetching salon hours:", error);
+            }
+        };
+
+        fetchSalonHours();
+    }, []);
+
+    useEffect(() => {
+        const fetchTimeSlots = async () => {
+            // when selected is null or not selected by user do nothing
+            if (!selectedDate) return;
+
+            try {
+
+                //fetches all the booked appointments for the selected date
+                const { data, error } = await supabase
+                    .from('appointments')
+                    .select('start_time, date')
+                    .eq('status', 'booked')
+                    .eq('date', selectedDate.toISOString().split('T')[0])
+                if (error){
+                    console.error(error)
+                    return;
+                }
+
+                // create a date instance for each time
+                const bookedAppointments = data.map(time => 
+                    new Date(`${time.date} ${time.start_time}`)
+                );
+
+                // format each booked appointment in 12 hour format
+                const timeFormattedBookedAppointments = bookedAppointments.map(date => 
+                    Intl.DateTimeFormat('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    }).format(date)
+                );
+
+                    
+                // Get day of week from selected date
+                const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+                
+                // Find salon hours for selected day
+                const todayHours = salonHours.find(h => h.day_of_week === dayOfWeek);
+                
+                // if theree are hours for the selected day and its not closed
+                if (todayHours && !todayHours.is_closed) {
+                    // Generate time slots in 30-minute increments
+                    const times: string[] = [];
+                    
+                    //start time and end time are in 24 hour format
+                    const selectedDateStr = selectedDate.toISOString().split('T')[0];
+                    const start = new Date(`${selectedDateStr} ${todayHours.start_time}`);
+                    const end = new Date(`${selectedDateStr} ${todayHours.end_time}`);
+                    
+                    let current = new Date(start);
+
+                    // Check if selected date is today
+                    const now = new Date();
+                    const isToday = selectedDate.toDateString() === now.toDateString();
+                    
+                    // If it's today, adjust the start time to the next available 30-minute slot
+                    if (isToday) {
+                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                        const nextSlotMinutes = Math.ceil(currentMinutes / 30) * 30;
+                        current = new Date(`${selectedDateStr} ${Math.floor(nextSlotMinutes / 60).toString().padStart(2, '0')}:${(nextSlotMinutes % 60).toString().padStart(2, '0')}`);
+                    }
+
+                    while (current < end) {
+                        //format current time to 12 hour format
+                        const timeString = Intl.DateTimeFormat('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        }).format(current);
+         
+                        let isBooked;
+                        timeFormattedBookedAppointments.forEach(time => {
+                            //compare the booked times to the current time
+                            if (time == timeString){
+                                //mark current time as booked if it matches any booked times in db
+                                isBooked = true;
+                            }
+                        })
+                        
+                        if (!isBooked) {
+                            times.push(timeString);
+                        }
+                        
+                        // Add 30 minutes
+                        current.setMinutes(current.getMinutes() + 30);
+                    }
+                    
+                    setAvailableTimes(times);
+                } else {
+                    setAvailableTimes([]);
+                }
+
+            } catch (error) {
+                console.error("Error fetching time slots:", error);
+            }
+        };
+
+        fetchTimeSlots();
+    }, [selectedDate, salonHours]);
+
+    const getDaysInMonth = (date: Date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const days = [];
+        
+        // Add empty days for padding
+        for (let i = 0; i < firstDay.getDay(); i++) {
+            days.push(null);
+        }
+        
+        // Add actual days
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+            days.push(new Date(year, month, i));
+        }
+        
+        return days;
+    };
+
+    const handlePrevMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+    };
+
+    const handleNextMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+    };
+
+    const isToday = (date: Date) => {
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+               date.getMonth() === today.getMonth() &&
+               date.getFullYear() === today.getFullYear();
+    };
+
+    const isPastDate = (date: Date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        date.setHours(0, 0, 0, 0);
+        return date < today;
+    };
+
+    const formatDate = (date: Date) => {
+        return new Intl.DateTimeFormat('en-US', { 
+            month: 'long',
+            year: 'numeric'
+        }).format(date);
+    };
+
+    if (showBookingForm) {
+        return (
+            <BookingForm 
+                selectedDate={selectedDate}
+                selectedTime={selectedTime}
+                onBack={() => setShowBookingForm(false)}
+                onSuccess={() => {
+                    setShowBookingForm(false);
+                    setSelectedDate(null);
+                    setSelectedTime(null);
+                }}
+            />
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                <div className="bg-white rounded-lg shadow-md p-8">
+                    <h1 className="text-3xl font-bold text-center text-primary mb-8">Book Your Appointment</h1>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Calendar Section */}
+                        <div className="border rounded-lg p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <button 
+                                    onClick={handlePrevMonth}
+                                    className="p-2 hover:bg-gray-100 rounded-full"
+                                >
+                                    <FiChevronLeft className="w-5 h-5" />
+                                </button>
+                                <h2 className="text-xl font-semibold">
+                                    {formatDate(currentMonth)}
+                                </h2>
+                                <button 
+                                    onClick={handleNextMonth}
+                                    className="p-2 hover:bg-gray-100 rounded-full"
+                                >
+                                    <FiChevronRight className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-7 gap-2 mb-2">
+                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                                    <div key={day} className="text-center text-sm font-medium text-gray-500">
+                                        {day}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="grid grid-cols-7 gap-2">
+                                {getDaysInMonth(currentMonth).map((date, index) => (
+                                    <div key={index} className="aspect-square">
+                                        {date && (
+                                            <button
+                                                onClick={() => setSelectedDate(date)}
+                                                disabled={isPastDate(date)}
+                                                className={`w-full h-full flex items-center justify-center rounded-lg text-sm
+                                                    ${isPastDate(date) ? 'text-gray-300 cursor-not-allowed' :
+                                                    selectedDate?.getTime() === date.getTime() ? 'bg-accent text-primary' :
+                                                    isToday(date) ? 'border-black border' : 'hover:bg-gray-50'}`}
+                                            >
+                                                {date.getDate()}
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Time Slots Section */}
+                        <div className="border rounded-lg p-6">
+                            <h3 className="text-xl font-semibold mb-6 flex items-center">
+                                <FiClock className="mr-2" />
+                                Available Times
+                                {selectedDate && (
+                                    <span className="ml-2 text-sm font-normal text-gray-500">
+                                        for {selectedDate.toLocaleDateString()}
+                                    </span>
+                                )}
+                            </h3>
+
+                            {selectedDate ? (
+                                availableTimes.length > 0 ? (
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {availableTimes.map(time => (
+                                            <button
+                                                key={time}
+                                                onClick={() => setSelectedTime(time)}
+                                                className={`p-3 rounded-lg text-sm font-medium
+                                                    ${selectedTime === time 
+                                                        ? 'bg-accent text-primary' 
+                                                        : 'bg-gray-50 hover:bg-gray-100'}`}
+                                            >
+                                                {time}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-gray-500 py-8">
+                                        No available time slots for this date
+                                    </div>
+                                )
+                            ) : (
+                                <div className="text-center text-gray-500 py-8">
+                                    Please select a date to view available times
+                                </div>
+                            )}
+
+                            {selectedDate && selectedTime && (
+                                <div className="mt-8">
+                                    <button
+                                        onClick={() => setShowBookingForm(true)}
+                                        className="w-full py-3 bg-accent text-primary font-medium rounded-md hover:bg-opacity-90 transition-all duration-200"
+                                    >
+                                        Continue Booking
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+} 
