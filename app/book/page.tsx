@@ -57,7 +57,7 @@ export default function BookingPage() {
                     }
                 )
                 );
-                
+
                 // Get day of week from selected date
                 const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
                 
@@ -188,8 +188,12 @@ export default function BookingPage() {
     if (showBookingForm) {
         return (
             <BookingForm 
-                selectedDate={selectedDate}
-                selectedTime={selectedTime}
+                selectedDate={selectedDate?.toISOString().split('T')[0]}
+                selectedTime={selectedTime ? new Date(`2000-01-01 ${selectedTime}`).toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : null}
                 onBack={() => setShowBookingForm(false)}
                 onSuccess={() => {
                     setShowBookingForm(false);
@@ -242,10 +246,11 @@ export default function BookingPage() {
                                             <button
                                                 onClick={() => setSelectedDate(date)}
                                                 disabled={isPastDate(date)}
-                                                className={`w-full h-full flex items-center justify-center rounded-lg text-sm
+                                                className={`w-full h-full flex items-center justify-center rounded-lg text-sm transition-all duration-200
                                                     ${isPastDate(date) ? 'text-gray-300 cursor-not-allowed' :
-                                                    selectedDate?.getTime() === date.getTime() ? 'bg-accent text-primary' :
-                                                    isToday(date) ? 'border-black border' : 'hover:bg-gray-50'}`}
+                                                    selectedDate?.getTime() === date.getTime() ? 'bg-accent text-primary font-medium' :
+                                                    isToday(date) ? 'bg-primary/10 text-primary font-medium ring-1 ring-primary/20' : 
+                                                    'hover:bg-gray-50'}`}
                                             >
                                                 {date.getDate()}
                                             </button>
