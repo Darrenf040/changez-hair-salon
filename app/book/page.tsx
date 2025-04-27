@@ -41,7 +41,7 @@ export default function BookingPage() {
                 //fetches all the booked appointments for the selected date
                 const { data, error } = await supabase
                     .from('appointments')
-                    .select('start_time, date')
+                    .select('start_time, date, end_time')
                     .eq('status', 'booked')
                     .eq('date', selectedDate.toISOString().split('T')[0])
                 if (error){
@@ -50,20 +50,14 @@ export default function BookingPage() {
                 }
 
                 // create a date instance for each time
-                const bookedAppointments = data.map(time => 
-                    new Date(`${time.date} ${time.start_time}`)
+                const bookedAppointments: {start:Date, end: Date}[] = data.map(appt =>(
+                    {
+                        start: new Date(`${appt.date} ${appt.start_time}`),
+                        end: new Date(`${appt.date} ${appt.end_time}`),
+                    }
+                )
                 );
-
-                // format each booked appointment in 12 hour format
-                const timeFormattedBookedAppointments = bookedAppointments.map(date => 
-                    Intl.DateTimeFormat('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    }).format(date)
-                );
-
-                    
+                
                 // Get day of week from selected date
                 const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
                 
@@ -93,22 +87,33 @@ export default function BookingPage() {
                         current = new Date(`${selectedDateStr} ${Math.floor(nextSlotMinutes / 60).toString().padStart(2, '0')}:${(nextSlotMinutes % 60).toString().padStart(2, '0')}`);
                     }
 
+                    //time slot formatter
+                    const formatter = Intl.DateTimeFormat('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+     
+
+                    // Helper function to convert Date to minutes since midnight
+                    const getTimeInMinutes = (date: Date) => {
+                        return date.getHours() * 60 + date.getMinutes();
+                    };
+
                     while (current < end) {
                         //format current time to 12 hour format
-                        const timeString = Intl.DateTimeFormat('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        }).format(current);
-         
-                        let isBooked;
-                        timeFormattedBookedAppointments.forEach(time => {
-                            //compare the booked times to the current time
-                            if (time == timeString){
-                                //mark current time as booked if it matches any booked times in db
+                        const timeString = formatter.format(current);
+                        const currentTimeInMinutes = getTimeInMinutes(current);
+          
+                        let isBooked = false;
+                        bookedAppointments.forEach(appointment => {
+                            const startMinutes = getTimeInMinutes(appointment.start);
+                            const endMinutes = getTimeInMinutes(appointment.end);
+                            
+                            if (currentTimeInMinutes >= startMinutes && currentTimeInMinutes < endMinutes) {
                                 isBooked = true;
                             }
-                        })
+                        });
                         
                         if (!isBooked) {
                             times.push(timeString);
