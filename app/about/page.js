@@ -33,7 +33,7 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <p className="text-gray-600 text-lg">
-                Established in 2010, Elegant Hair has grown from a small local salon to
+                Established in 2010, Changez Hair Salon has grown from a small local salon to
                 one of the most trusted names in hair care. Our journey began with a simple
                 mission: to provide exceptional hair services while making every client feel
                 special and valued.

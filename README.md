@@ -1,4 +1,4 @@
-# Elegant Hair Salon Website
+# Changez Hair Salon Website
 
 A modern, responsive website for a hair salon built with Next.js and Tailwind CSS.
 

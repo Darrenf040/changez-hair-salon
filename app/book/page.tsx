@@ -6,14 +6,16 @@ import { FiChevronLeft, FiChevronRight, FiClock } from 'react-icons/fi';
 import { Hours } from '../types/hours';
 import BookingForm from '../components/BookingForm';
 import { BookedAppointments } from '../types/appointments';
+import BookingEntryChoice from '../components/booking/BookingEntryChoice';
 
 export default function BookingPage() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-    const [selectedTime, setSelectedTime] = useState<string | null>(null);
+    const [selectedTime, setSelectedTime] = useState<string>("");
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [salonHours, setSalonHours] = useState<Hours[]>([]);
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
     const [showBookingForm, setShowBookingForm] = useState(false);
+    const [showEntryChoice, setShowEntryChoice] = useState(false);
 
     useEffect(() => {
         const fetchSalonHours = async () => {
@@ -194,12 +196,28 @@ export default function BookingPage() {
                     hour: '2-digit',
                     minute: '2-digit'
                 }) : null}
-                onBack={() => setShowBookingForm(false)}
+                onBack={() => {
+                    setShowBookingForm(false);
+                    setShowEntryChoice(true);
+                }}
                 onSuccess={() => {
                     setShowBookingForm(false);
+                    setShowEntryChoice(false);
                     setSelectedDate(null);
                     setSelectedTime(null);
                 }}
+            />
+        );
+    }
+
+    if (showEntryChoice) {
+        return (
+            <BookingEntryChoice 
+                selectedDate={selectedDate?.toISOString().split('T')[0] || ''}
+                selectedTime={selectedTime}
+                onBack={() => setShowEntryChoice(false)}
+                showBookingForm={showBookingForm}
+                setShowBookingForm={setShowBookingForm}
             />
         );
     }
@@ -244,7 +262,10 @@ export default function BookingPage() {
                                     <div key={index} className="aspect-square">
                                         {date && (
                                             <button
-                                                onClick={() => setSelectedDate(date)}
+                                                onClick={() => {
+                                                    setSelectedDate(date)
+                                                    setSelectedTime("")
+                                                }}
                                                 disabled={isPastDate(date)}
                                                 className={`w-full h-full flex items-center justify-center rounded-lg text-sm transition-all duration-200
                                                     ${isPastDate(date) ? 'text-gray-300 cursor-not-allowed' :
@@ -302,7 +323,10 @@ export default function BookingPage() {
                             {selectedDate && selectedTime && (
                                 <div className="mt-8">
                                     <button
-                                        onClick={() => setShowBookingForm(true)}
+                                        onClick={() => {
+                                            setShowEntryChoice(true);
+                                            setShowBookingForm(false);
+                                        }}
                                         className="w-full py-3 bg-accent text-primary font-medium rounded-md hover:bg-opacity-90 transition-all duration-200"
                                     >
                                         Continue Booking

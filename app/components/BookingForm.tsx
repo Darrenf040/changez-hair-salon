@@ -11,14 +11,19 @@ interface BookingFormProps {
     selectedTime: string | null;  // HH:mm format
     onBack: () => void;
     onSuccess: () => void;
+    initialData?: {
+        name: string;
+        email: string;
+        phone: string;
+    };
 }
 
-export default function BookingForm({ selectedDate, selectedTime, onBack, onSuccess }: BookingFormProps) {
+export default function BookingForm({ selectedDate, selectedTime, onBack, onSuccess, initialData }: BookingFormProps) {
 
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
+        name: initialData?.name || '',
+        email: initialData?.email || '',
+        phone: initialData?.phone || '',
         services: [] as string[],
         notes: ''
     });
@@ -221,14 +226,14 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
                             className="flex items-center text-gray-600 mb-6 hover:text-gray-900"
                         >
                             <FiArrowLeft className="mr-2" />
-                            Back to Calendar
+                            Back to Booking Options
                         </button>
 
                         <h2 className="text-2xl font-bold text-center text-primary mb-6">
                             Complete Your Booking
                         </h2>
 
-                        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                        <div className="mb-6">
                             <p className="text-sm text-gray-600">
                                 Selected Date: <span className="font-medium">{new Intl.DateTimeFormat("en-US", {
                                     year: "numeric",
