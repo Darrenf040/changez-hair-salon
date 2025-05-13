@@ -24,7 +24,7 @@ export default function SignUpPage() {
 
     try {
       await signUp(formData.email, formData.password, formData.full_name, formData.phone)
-      router.push('/')
+      router.push('/profile')
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : 'Failed to create account',
@@ -106,6 +106,20 @@ export default function SignUpPage() {
               placeholder="Create a password"
             />
           </div>
+          <p className="text-xs opacity-75">By creating an account you agree to the{" "}
+
+            <Link 
+            href={"/terms"}
+            className='underline'>
+              Terms of Service
+            </Link> and {" "}
+            <Link 
+            href={"/privacy"}
+            className='underline'>
+              Privacy Policy
+            </Link>
+          </p>
+
 
           <button
             type="submit"

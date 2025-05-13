@@ -1,9 +1,11 @@
 'use client'
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../context/AuthContext'
 import { SignInData, AuthError } from '../types/auth'
+import OneTapComponent from '../components/GoogleOneTap'
+import { supabase } from '../utils/supabase/supabaseClient'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState<SignInData>({
@@ -15,6 +17,12 @@ export default function LoginPage() {
   const { signIn } = useAuth()
   const router = useRouter()
 
+    /**
+   * Step 1: Send the user an email to get a password reset token.
+   * This email contains a link which sends the user back to your application.
+   */
+
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
@@ -22,7 +30,7 @@ export default function LoginPage() {
 
     try {
       await signIn(formData.email, formData.password)
-      router.push('/')
+      router.push('/profile')
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : 'Failed to sign in',
@@ -75,12 +83,11 @@ export default function LoginPage() {
               placeholder="Enter your password"
             />
             <div className="mt-1 text-right">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-accent hover:text-primary transition-colors"
-              >
-                Forgot Password?
-              </Link>
+              <Link   
+                href={"forgot-password"}              
+                className="text-sm text-accent hover:text-primary transition-colors">
+                  forgot password
+              </Link>                
             </div>
           </div>
 
@@ -93,6 +100,8 @@ export default function LoginPage() {
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
+          <OneTapComponent />
+
 
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">

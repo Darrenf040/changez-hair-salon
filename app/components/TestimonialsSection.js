@@ -9,24 +9,24 @@ export default function TestimonialsSection() {
       avatar: "/review-avatar-1.jpg",
       rating: 5,
       date: "2 weeks ago",
-      review: "Absolutely amazing experience! Olivia transformed my hair completely. The attention to detail and professional service is unmatched. Highly recommend!",
-      service: "Haircut & Color"
+      review: "Absolutely amazing experience! Carletha transformed my hair completely. The attention to detail and professional service is unmatched. Highly recommend!",
+      service: "Shampoo & Style"
     },
     {
-      author: "Michael S.",
+      author: "Tamika B.",
       avatar: "/review-avatar-2.jpg",
       rating: 5,
       date: "1 month ago",
-      review: "Marcus is a color genius! He understood exactly what I wanted and delivered beyond my expectations. The salon atmosphere is so welcoming and professional.",
-      service: "Balayage"
+      review: "The color services at Changez Salon are truly exceptional! The team listened to my vision and delivered results that exceeded my expectations. The atmosphere is both welcoming and professional, making every visit a pleasure.",
+      service: "Permanent Color"
     },
     {
       author: "Sarah K.",
       avatar: "/review-avatar-3.jpg",
       rating: 5,
       date: "2 months ago",
-      review: "Best salon experience ever! Sophia worked magic with my curly hair. For the first time, I have a stylist who truly understands curly hair care.",
-      service: "Curly Hair Styling"
+      review: "The best salon experience I've ever had. As someone with curly hair, I finally found a place that understands and cares for my hair type. The staff's expertise and the relaxing environment make it my go-to salon.",
+      service: "Twist Out"
     }
   ]
 
@@ -48,8 +48,9 @@ export default function TestimonialsSection() {
           {reviews.map((review, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow flex flex-col justify-between"
             >
+            <div>
             <div className="flex items-center mb-4 gap-4">
               <div className="relative w-12 h-12 rounded-full overflow-hidden flex justify-center items-center bg-gray-50">
                   <FiUser />
@@ -69,6 +70,8 @@ export default function TestimonialsSection() {
               </div>
               
               <p className="text-gray-600 mb-3">{review.review}</p>
+
+            </div>
               
               <div className="flex items-center">
                 <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-600">

@@ -1,22 +1,17 @@
 'use client'
-import { FiInstagram, FiFacebook, FiTwitter } from 'react-icons/fi'
-import Image from 'next/image'
-import { team } from './team'
-import TeamCard from './TeamCard'
+import Link from 'next/link'
+import { FiInstagram, FiFacebook,  } from 'react-icons/fi'
+import CarlethaCard from "../components/ui/CarlethaCard.jsx"
 
 export default function StylistsSection() {
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-16">Our Stylists</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {team.map((member, index) => (
-           <TeamCard key={index} member={member}  />
-          ))}
-        </div>
-      </div>
-    </section>
+    <div className="bg-gray-50 py-16">
+    <div className="py-16 container mx-auto px-4 max-w-4xl">
+      <CarlethaCard />
+    </div>
+  </div>
+
   )
 } 
+

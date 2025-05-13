@@ -2,7 +2,7 @@
 
 import { Service } from '../types/services';
 import { FaClock } from 'react-icons/fa';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../utils/supabase/supabaseClient';
 import { useState, useEffect, Suspense } from 'react';
 import { ServiceSkeletonGrid } from './ServiceCardSkeleton';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ const ServiceCard = ({ service }: { service: Service }) => (
         </div>
         <div className="pt-4 border-t border-secondary">
             <Link 
-                href={service.requires_consultation ? "/contact" : "/book"}
+                href={"/book"}
                 className="block w-full text-center px-4 py-2.5 bg-accent text-primary font-medium rounded hover:bg-opacity-90 transition-all duration-200"
             >
                 Book Now
@@ -74,7 +74,7 @@ const ServicesContent = () => {
                 {loading ? (
                     <ServiceSkeletonGrid />
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {mainServices.map((service, index) => (
                             <ServiceCard key={index} service={service} />
                         ))}

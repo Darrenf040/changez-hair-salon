@@ -1,15 +1,16 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function HeroCarousel() {
   const [currentImage, setCurrentImage] = useState(0)
 
   const images = [
-    '/salon-hero-1.jpg',
-    '/salon-hero-2.jpg',
-    '/salon-hero-3.jpg',
-    '/salon-hero-4.jpg'
+    '/assets/hero-images/detangle-brush.jpg',
+    '/assets/hero-images/hair-products.jpg',
+    '/assets/hero-images/salon-chair.jpg',
+    '/assets/hero-images/sink.jpg',
   ]
 
   useEffect(() => {
@@ -18,28 +19,32 @@ export default function HeroCarousel() {
     }, 5000) // Change image every 5 seconds
 
     return () => clearInterval(timer)
-  }, [])
+  }, [images.length])
 
   return (
-    <section className="relative h-[80vh] min-h-[600px] bg-gray-900">
+    <section className="relative h-[80vh] min-h-[600px] bg-gray-900 overflow-hidden">
       {/* Image Carousel */}
       {images.map((image, index) => (
         <div
           key={image}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            currentImage === index ? 'opacity-100' : 'opacity-0'
+            currentImage === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${image})` }}
+          <Image
+            src={image}
+            alt=""
+            fill
+            priority={index === 0}
+            className="object-cover object-center w-full h-full"
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
         </div>
       ))}
 
       {/* Content */}
-      <div className="relative h-full flex flex-col items-center justify-center text-white text-center px-4">
+      <div className="relative h-full flex flex-col items-center justify-center text-white text-center px-4 z-20">
         <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
           Transform Your Style
         </h1>
@@ -63,7 +68,7 @@ export default function HeroCarousel() {
       </div>
 
       {/* Carousel Indicators */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-2">
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-2 z-30">
         {images.map((_, index) => (
           <button
             key={index}
@@ -77,4 +82,4 @@ export default function HeroCarousel() {
       </div>
     </section>
   )
-} 
+}

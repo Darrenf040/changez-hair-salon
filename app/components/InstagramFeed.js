@@ -14,22 +14,8 @@ export default function InstagramFeed() {
       link: "#",
       alt: "Professional hair styling tools"
     },
-    {
-      image: "/assets/posts/post3.jpg",
-      link: "#",
-      alt: "Hair coloring process"
-    },
-    {
-      image: "/assets/posts/post4.jpg",
-      link: "#",
-      alt: "Styling session in progress"
-    },
-    {
-      image: "/assets/posts/post5.jpg",
-      link: "#",
-      alt: "Precision cutting technique"
-    },
-
+ 
+ 
   ]
 
   return (
@@ -45,11 +31,11 @@ export default function InstagramFeed() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">          
           {instagramPosts.map((post, index) => (
             <a
               key={index}
-              href={post.link}
+              href={"https://www.instagram.com/changez1_/"}
               target="_blank"
               rel="noopener noreferrer"
               className="relative aspect-square group overflow-hidden"
@@ -69,7 +55,7 @@ export default function InstagramFeed() {
 
         <div className="text-center mt-8">
           <a
-            href=""
+            href="https://www.instagram.com/changez1_"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all"

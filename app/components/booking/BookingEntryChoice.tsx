@@ -95,7 +95,7 @@ export default function BookingEntryChoice({ selectedDate, selectedTime, onBack,
 
                 <Card
                     clickable
-                    onClick={() => router.push(`/auth/signin?redirect=/booking/authenticated?date=${selectedDate}&time=${selectedTime}`)}
+                    onClick={() => router.push(`/login`)}
                 >
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { supabase } from '../utils/supabaseClient';
-import { Service } from '../types/services';
+import { supabase } from '../../utils/supabase/supabaseClient';
+import { Service } from '../../types/services';
 import BookingConfirmation from './BookingConfirmation';
 
 interface BookingFormProps {
@@ -81,6 +81,18 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
         }, 0);
     };
 
+    const formatTotal = () => {
+        const totalString = calculateTotal().toString();
+
+        const requiresConsultation = formData.services.some((serviceName) => {
+            const serviceDetails = services.find(service => service.name === serviceName);
+            return serviceDetails?.requires_consultation === true;
+        });
+
+        return requiresConsultation ? `Base Price: $${totalString}. Some services require evaluation. Price determined at visit.`: `$${totalString}`;
+
+    }
+
     const calculateDuration = () => {
         return services.reduce((total, service) => {
             if (formData.services.includes(service.name)) {
@@ -115,7 +127,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
 
             // Start a transaction
             const { data: customerData, error: customerError } = await supabase
-                .from('users')
+                .from('guests')
                 .insert({
                     name: formData.name,
                     email: formData.email,
@@ -124,18 +136,20 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
                 .select("id")
                 .single();
 
+
             if (customerError) throw customerError;
 
             // Create appointment and get its ID
             const { data: appointmentData, error: appointmentError } = await supabase
                 .from('appointments')
                 .insert({
-                    user_id: customerData.id,
+                    guest_id: customerData.id,
                     date: selectedDate,
                     start_time: selectedTime,
                     end_time: formattedEndTime,
                     status: "booked",
-                    notes: formData.notes
+                    notes: formData.notes,
+                    total: formatTotal()
                 })
                 .select('id')
                 .single();
@@ -205,6 +219,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             {showConfirmation && bookingDetails ? (
                 <BookingConfirmation 
+                    isAuth={false}
                     bookingDetails={bookingDetails}
                     onClose={() => {
                         setShowConfirmation(false);
@@ -250,15 +265,6 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
                             </p>
                         </div>
 
-                        {submitMessage && (
-                            <div className={`mb-6 p-4 rounded ${
-                                submitMessage.includes('success') 
-                                    ? 'bg-green-50 text-green-800' 
-                                    : 'bg-red-50 text-red-800'
-                            }`}>
-                                {submitMessage}
-                            </div>
-                        )}
 
                         <div className="flex justify-center">
                             <div className="w-full max-w-2xl">
@@ -272,7 +278,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-6">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                                         Name
@@ -413,6 +419,15 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
                                 </button>
                             </div>
                         </form>
+                        {submitMessage && (
+                            <div className={`my-6 p-4 rounded ${
+                                submitMessage.includes('success') 
+                                    ? 'bg-green-50 text-green-800' 
+                                    : 'bg-red-50 text-red-800'
+                            }`}>
+                                {submitMessage}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

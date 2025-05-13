@@ -1,4 +1,5 @@
-import { Service } from '../types/services';
+import Link from 'next/link';
+import { Service } from '../../types/services';
 
 interface BookingConfirmationProps {
     bookingDetails: {
@@ -14,9 +15,10 @@ interface BookingConfirmationProps {
         totalDuration: number;
     };
     onClose: () => void;
+    isAuth: boolean;
 }
 
-export default function BookingConfirmation({ bookingDetails, onClose }: BookingConfirmationProps) {
+export default function BookingConfirmation({ bookingDetails, onClose, isAuth }: BookingConfirmationProps) {
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('en-US', {
             weekday: 'long',
@@ -106,13 +108,18 @@ export default function BookingConfirmation({ bookingDetails, onClose }: Booking
                         )}
                     </div>
 
-                    <div className="mt-8 flex justify-center">
+                    <div className="mt-8 flex justify-center gap-4">
                         <button
                             onClick={onClose}
                             className="px-6 py-2 bg-accent text-primary font-medium rounded-md hover:bg-opacity-90 transition-all duration-200"
                         >
                             Close
                         </button>
+                        <Link href={isAuth ? "/appointments": "/check-appointment"}
+                            className="px-6 py-2 bg-primary text-white font-medium rounded-md hover:bg-opacity-90 transition-all duration-200"
+>
+                            View Appointments
+                        </Link>
                     </div>
                 </div>
             </div>

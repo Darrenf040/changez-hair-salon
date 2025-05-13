@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../utils/supabase/supabaseClient';
 import { FiChevronLeft, FiChevronRight, FiClock } from 'react-icons/fi';
 import { Hours } from '../types/hours';
-import BookingForm from '../components/BookingForm';
+import BookingForm from '../components/booking/BookingForm';
 import { BookedAppointments } from '../types/appointments';
 import BookingEntryChoice from '../components/booking/BookingEntryChoice';
+import { useAuth } from '../context/AuthContext';
+import AuthBookingForm from '../components/booking/AuthBookingForm';
 
 export default function BookingPage() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -15,7 +17,9 @@ export default function BookingPage() {
     const [salonHours, setSalonHours] = useState<Hours[]>([]);
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
     const [showBookingForm, setShowBookingForm] = useState(false);
+    const [showAuthBookingForm, setShowAuthBookingForm] = useState(false);
     const [showEntryChoice, setShowEntryChoice] = useState(false);
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
         const fetchSalonHours = async () => {
@@ -31,7 +35,7 @@ export default function BookingPage() {
         };
 
         fetchSalonHours();
-    }, []);
+    }, [selectedDate]);
 
     useEffect(() => {
         const fetchTimeSlots = async () => {
@@ -124,7 +128,6 @@ export default function BookingPage() {
                         // Add 30 minutes
                         current.setMinutes(current.getMinutes() + 30);
                     }
-                    
                     setAvailableTimes(times);
                 } else {
                     setAvailableTimes([]);
@@ -154,7 +157,6 @@ export default function BookingPage() {
         for (let i = 1; i <= lastDay.getDate(); i++) {
             days.push(new Date(year, month, i));
         }
-        
         return days;
     };
 
@@ -203,6 +205,28 @@ export default function BookingPage() {
                 onSuccess={() => {
                     setShowBookingForm(false);
                     setShowEntryChoice(false);
+                    setSelectedDate(null);
+                    setSelectedTime(null);
+                }}
+            />
+        );
+    }
+    if(showAuthBookingForm){
+        return (
+            <AuthBookingForm 
+                selectedDate={selectedDate?.toISOString().split('T')[0]}
+                selectedTime={selectedTime ? new Date(`2000-01-01 ${selectedTime}`).toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : null}
+                onBack={() => {
+                    setShowBookingForm(false);
+                    setShowEntryChoice(false);
+                    setShowAuthBookingForm(false)
+                }}
+                onSuccess={() => {
+                    setShowAuthBookingForm(false);
                     setSelectedDate(null);
                     setSelectedTime(null);
                 }}
@@ -323,9 +347,14 @@ export default function BookingPage() {
                             {selectedDate && selectedTime && (
                                 <div className="mt-8">
                                     <button
-                                        onClick={() => {
-                                            setShowEntryChoice(true);
-                                            setShowBookingForm(false);
+                                        onClick={() => {                                                
+                                            if (isAuthenticated) {
+                                                setShowEntryChoice(false);
+                                                setShowAuthBookingForm(true);
+                                            } else {
+                                                setShowEntryChoice(true);
+                                                setShowBookingForm(false);
+                                            }
                                         }}
                                         className="w-full py-3 bg-accent text-primary font-medium rounded-md hover:bg-opacity-90 transition-all duration-200"
                                     >

@@ -1,103 +1,35 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { FiScissors, FiDroplet, FiStar, FiTrendingUp, FiClock, FiChevronDown } from 'react-icons/fi'
+import { FiScissors, FiLayers, FiPlusCircle, FiClock, FiChevronDown } from 'react-icons/fi'
 
 export default function ServiceTabs() {
-  const [activeTab, setActiveTab] = useState('Haircuts')
+  const [activeTab, setActiveTab] = useState('Styling')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const tabs = [
-    { id: 'Haircuts', icon: <FiScissors className="w-5 h-5" /> },
-    { id: 'Coloring', icon: <FiDroplet className="w-5 h-5" /> },
-    { id: 'Treatments', icon: <FiStar className="w-5 h-5" /> },
-    { id: 'Trending', icon: <FiTrendingUp className="w-5 h-5" /> },
+    { id: 'Styling', icon: <FiScissors className="w-5 h-5" /> },
+    { id: 'Extensions', icon: <FiLayers className="w-5 h-5" /> },
+    { id: 'AddOns', icon: <FiPlusCircle className="w-5 h-5" /> },
   ]
-
   const services = {
-    Haircuts: [
-      {
-        title: "Women's Haircut",
-        duration: "60 min",
-        description: "Precision cut tailored to your face shape and style preferences, includes consultation, wash, and styling.",
-        price: "From $65",
-      },
-      {
-        title: "Men's Haircut",
-        duration: "45 min",
-        description: "Classic or modern styles with meticulous attention to detail, includes consultation and styling.",
-        price: "From $45",
-      },
-      {
-        title: "Children's Haircut",
-        duration: "30 min",
-        description: "Gentle, patient approach for kids under 12, with fun and comfortable experience.",
-        price: "From $35",
-      },
+    Styling: [
+      { title: "Shampoo and Style", duration: "60 min", price: "$75" },
+      { title: "Relaxer and Style", duration: "90 min", price: "$125" },
+      { title: "Rinse and Style", duration: "30 min", price: "$105" },
     ],
-    Coloring: [
-      {
-        title: "Full Color",
-        duration: "120 min",
-        description: "Complete hair color transformation with premium products for vibrant, long-lasting results.",
-        price: "From $95",
-      },
-      {
-        title: "Highlights",
-        duration: "90 min",
-        description: "Dimensional color with foil highlights, customized to your desired look.",
-        price: "From $120",
-      },
-      {
-        title: "Balayage",
-        duration: "150 min",
-        description: "Hand-painted highlights creating natural-looking, sun-kissed dimension.",
-        price: "From $150",
-      },
+    Extensions: [
+      { title: "Traditional Sew In (up to 3 bundles)", duration: "120 min", price: "$200" },
+      { title: "Micro-links", duration: "30 min", price: "Consultation Required" },
+      { title: "Sew-in with Closure", duration: "90 min", price: "$230" },
     ],
-    Treatments: [
-      {
-        title: "Deep Conditioning",
-        duration: "30 min",
-        description: "Intensive moisture treatment to restore and revitalize damaged hair.",
-        price: "From $35",
-      },
-      {
-        title: "Keratin Treatment",
-        duration: "120 min",
-        description: "Professional smoothing treatment for frizz-free, manageable hair.",
-        price: "From $250",
-      },
-      {
-        title: "Scalp Treatment",
-        duration: "45 min",
-        description: "Therapeutic scalp treatment to promote healthy hair growth.",
-        price: "From $55",
-      },
-    ],
-    Trending: [
-      {
-        title: "Brazilian Blowout",
-        duration: "120 min",
-        description: "Premium smoothing treatment for silky, manageable hair that lasts up to 3 months.",
-        price: "From $200",
-      },
-      {
-        title: "Fashion Colors",
-        duration: "180 min",
-        description: "Vibrant, creative color options including pastels and bold hues.",
-        price: "From $150",
-      },
-      {
-        title: "Hair Extensions",
-        duration: "120 min",
-        description: "Premium quality extensions for added length and volume.",
-        price: "From $300",
-      },
+    AddOns: [
+      { title: "Permanent Color", duration: "30 min", price: "Consultation Required" },
+      { title: "Trim", duration: "30 min", price: "$25" },
+      { title: "Cut", duration: "30 min", price: "$35" },
     ],
   }
-
-  const handleTabChange = (tabId) => {
+    const handleTabChange = (tabId) => {
     setActiveTab(tabId)
     setIsDropdownOpen(false)
   }
@@ -164,7 +96,7 @@ export default function ServiceTabs() {
 
         {/* Service Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services[activeTab].map((service, index) => (
+          { services && services[activeTab].map((service, index) => (
             <div
               key={index}
               className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
