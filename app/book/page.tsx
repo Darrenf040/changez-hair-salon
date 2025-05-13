@@ -5,7 +5,6 @@ import { supabase } from '../utils/supabase/supabaseClient';
 import { FiChevronLeft, FiChevronRight, FiClock } from 'react-icons/fi';
 import { Hours } from '../types/hours';
 import BookingForm from '../components/booking/BookingForm';
-import { BookedAppointments } from '../types/appointments';
 import BookingEntryChoice from '../components/booking/BookingEntryChoice';
 import { useAuth } from '../context/AuthContext';
 import AuthBookingForm from '../components/booking/AuthBookingForm';
@@ -63,6 +62,11 @@ export default function BookingPage() {
                     }
                 )
                 );
+                // Helper function to convert Date to minutes since midnight
+                const getTimeInMinutes = (date: Date) => {
+                    return date.getHours() * 60 + date.getMinutes();
+                };
+            
 
                 // Get day of week from selected date
                 const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
@@ -87,10 +91,17 @@ export default function BookingPage() {
                     const isToday = selectedDate.toDateString() === now.toDateString();
                     
                     // If it's today, adjust the start time to the next available 30-minute slot
-                    if (isToday) {
+                    if (isToday ) {
+                        //caclulate current time 
                         const currentMinutes = now.getHours() * 60 + now.getMinutes();
                         const nextSlotMinutes = Math.ceil(currentMinutes / 30) * 30;
-                        current = new Date(`${selectedDateStr} ${Math.floor(nextSlotMinutes / 60).toString().padStart(2, '0')}:${(nextSlotMinutes % 60).toString().padStart(2, '0')}`);
+                        const time = new Date(`${selectedDateStr} ${Math.floor(nextSlotMinutes / 60).toString().padStart(2, '0')}:${(nextSlotMinutes % 60).toString().padStart(2, '0')}`);
+                        const currentTime = getTimeInMinutes(time)
+
+                        // current time is past the days store hours
+                        if(currentTime >= getTimeInMinutes(current)){
+                            current = time;
+                        }
                     }
 
                     //time slot formatter
@@ -100,11 +111,6 @@ export default function BookingPage() {
                         hour12: true
                     });
      
-
-                    // Helper function to convert Date to minutes since midnight
-                    const getTimeInMinutes = (date: Date) => {
-                        return date.getHours() * 60 + date.getMinutes();
-                    };
 
                     while (current < end) {
                         //format current time to 12 hour format
