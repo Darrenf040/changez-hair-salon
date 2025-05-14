@@ -117,6 +117,12 @@ export default function CheckAppointment() {
                   required
                 />
               </div>
+              {message ?
+              <div className="mb-4 p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
+                <FiAlertCircle />
+                <p className="text-sm">{message}</p>
+              </div>: ""
+              }
               <button
                 type="submit"
                 className="w-full bg-accent hover:bg-opacity-90 text-white font-medium py-2 px-4 rounded-md transition duration-300"
@@ -127,9 +133,6 @@ export default function CheckAppointment() {
   
             <div className="mt-6 text-center">
             Need to book a new appointment? <Link className="text-accent hover:underline" href={"/book"}>Book here</Link>
-            </div>
-            <div>
-              {message}
             </div>
           </div>
         </div>
