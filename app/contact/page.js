@@ -1,29 +1,37 @@
-'use client'
-import { useState } from 'react'
+"use client"
+
 import { FiPhone, FiMail, FiMapPin, FiClock } from 'react-icons/fi'
+import emailjs from "@emailjs/browser"
+import { useState } from 'react'
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  })
+  const [isLoading, setIsloading] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Here you would typically handle the form submission
-    alert('Thank you for your message. We will get back to you soon!')
-    setFormData({ name: '', email: '', phone: '', message: '' })
+    setIsloading(true)
+    try{
+      emailjs.sendForm(process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID, process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID, e.target, {
+        publicKey: process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY
+      }).then(res => {
+        setIsloading(false)
+        alert('Thank you for your message. We will get back to you soon!')    
+      }).catch(err => {
+        if(err){
+          setIsloading(false)
+          alert('Error sending email')
+          return
+        }
+      })
+    } catch(err){
+      if(err){
+        setIsloading(false)
+        alert('An unexcepceted error occured please try again')
+        return
+      }
+    }
   }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
 
   const contactInfo = [
     {
@@ -94,7 +102,7 @@ export default function Contact() {
 
           {/* Contact Form */}
           <div>
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8">
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8" id='contact-form'>
               <h2 className="text-2xl font-semibold mb-6">Send us a Message</h2>
               <div className="space-y-4">
                 <div>
@@ -105,8 +113,6 @@ export default function Contact() {
                     type="text"
                     id="name"
                     name="name"
-                    value={formData.name}
-                    onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
@@ -120,8 +126,6 @@ export default function Contact() {
                     type="email"
                     id="email"
                     name="email"
-                    value={formData.email}
-                    onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
@@ -135,8 +139,6 @@ export default function Contact() {
                     type="tel"
                     id="phone"
                     name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
                   />
                 </div>
@@ -148,8 +150,6 @@ export default function Contact() {
                   <textarea
                     id="message"
                     name="message"
-                    value={formData.message}
-                    onChange={handleChange}
                     required
                     rows="4"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent"
@@ -160,7 +160,7 @@ export default function Contact() {
                   type="submit"
                   className="w-full bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
                 >
-                  Send Message
+                  {isLoading ? "Sending...": "Send Message"}
                 </button>
               </div>
             </form>
