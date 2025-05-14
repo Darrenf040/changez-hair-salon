@@ -192,7 +192,7 @@ export default function About() {
             the area.
           </p>
           <a
-            href="/book-appointment"
+            href="/book"
             className="inline-block bg-accent hover:bg-opacity-90 text-white font-medium py-3 px-8 rounded-md transition duration-300"
           >
             Book Your Appointment Today
