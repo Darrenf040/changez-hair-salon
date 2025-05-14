@@ -3,14 +3,15 @@
 import { useState } from "react"
 import { supabase } from "../utils/supabase/supabaseClient"
 import GuestAppointments from "../components/guest appointment/GuestAppointments"
+import { FiAlertCircle } from "react-icons/fi"
+import Link from "next/link"
 
 export default function CheckAppointment() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
   const [showAppointments ,setShowAppointments] = useState(false)
   const [guestAppointments, setGuestAppointments] = useState([])
-  const [pendingCancelAppointmentId, setPendingCancelAppointmentId] = useState(null)
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
 
 
 
@@ -90,6 +91,14 @@ export default function CheckAppointment() {
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
           <div className="px-6 py-8">
             <h1 className="text-2xl font-bold text-primary mb-6 text-center">Check Guest Appointments</h1>
+            <div className="flex gap-4 px-4 py-2 my-4 bg-amber-50 border border-amber-200">
+              <div>
+                <FiAlertCircle />
+              </div>
+              <div className="text-sm">
+              This form is for <strong>guests only</strong>. If you have an account, please <Link className="underline" href={"/login"}>log in</Link> to view your appointments.
+              </div>
+            </div>
   
             <p className="text-gray-600 mb-6 text-center">
               Enter your email to check your guest appointment details.
@@ -117,9 +126,7 @@ export default function CheckAppointment() {
             </form>
   
             <div className="mt-6 text-center">
-              <a href="/book" className="text-accent hover:underline">
-                Need to book a new appointment?
-              </a>
+            Need to book a new appointment? <Link className="text-accent hover:underline" href={"/book"}>Book here</Link>
             </div>
             <div>
               {message}

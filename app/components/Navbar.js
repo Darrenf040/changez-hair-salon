@@ -64,6 +64,7 @@ export default function Navbar() {
           {/* Center nav links (desktop only) */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
+              link.href == "/check-appointment" && user ? "":
               <Link
                 key={link.href}
                 href={link.href}
@@ -169,6 +170,7 @@ export default function Navbar() {
           <div className="lg:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navLinks.map((link) => (
+                link.href == "/check-appointment" && user ? "": 
                 <Link
                   key={link.href}
                   href={link.href}
