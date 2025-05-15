@@ -35,6 +35,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
     const [bookingDetails, setBookingDetails] = useState<any>(null);
 
     useEffect(() => {
+        setIsLoading(true)
         const fetchServices = async () => {
             try {
                 const { data, error } = await supabase
@@ -250,18 +251,24 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
 
                         <div className="mb-6">
                             <p className="text-sm text-gray-600">
-                                Selected Date: <span className="font-medium">{new Intl.DateTimeFormat("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric"
-                                }).format(new Date(selectedDate + 'T00:00:00'))}</span>
+                            Selected Date: 
+                            <span className="font-medium">
+                                {selectedDate ? new Intl.DateTimeFormat("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric"
+                                }).format(new Date(`${selectedDate}T00:00:00`)) : "Not selected"}
+                            </span>
                             </p>
+
                             <p className="text-sm text-gray-600">
-                                Selected Time: <span className="font-medium">{new Intl.DateTimeFormat("en-US", {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                }).format(new Date(`1970-01-01T${selectedTime}:00`))}</span>
+                            Selected Time: <span className="font-medium">
+                                {selectedTime ? new Intl.DateTimeFormat("en-US", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                                }).format(new Date(`1970-01-01T${selectedTime}:00`)) : "Not selected"}
+                            </span>
                             </p>
                         </div>
 
