@@ -8,6 +8,9 @@ import BookingForm from '../components/booking/BookingForm';
 import BookingEntryChoice from '../components/booking/BookingEntryChoice';
 import { useAuth } from '../context/AuthContext';
 import AuthBookingForm from '../components/booking/AuthBookingForm';
+import dayjs from 'dayjs';
+
+
 
 export default function BookingPage() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -19,6 +22,7 @@ export default function BookingPage() {
     const [showAuthBookingForm, setShowAuthBookingForm] = useState(false);
     const [showEntryChoice, setShowEntryChoice] = useState(false);
     const { isAuthenticated } = useAuth();
+
 
     useEffect(() => {
         const fetchSalonHours = async () => {
@@ -37,6 +41,7 @@ export default function BookingPage() {
     }, [selectedDate]);
 
     useEffect(() => {
+        console.log("from book page: ", selectedTime)
         const fetchTimeSlots = async () => {
             // when selected is null or not selected by user do nothing
             if (!selectedDate) return;
@@ -188,22 +193,11 @@ export default function BookingPage() {
         return date < today;
     };
 
-    const formatDate = (date: Date) => {
-        return new Intl.DateTimeFormat('en-US', { 
-            month: 'long',
-            year: 'numeric'
-        }).format(date);
-    };
-
     if (showBookingForm) {
         return (
             <BookingForm 
                 selectedDate={selectedDate?.toISOString().split('T')[0]}
-                selectedTime={selectedTime ? new Date(`2000-01-01 ${selectedTime}`).toLocaleTimeString('en-US', {
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) : null}
+                selectedTime={selectedTime ? selectedTime: "Not Selected"}
                 onBack={() => {
                     setShowBookingForm(false);
                     setShowEntryChoice(true);
@@ -221,11 +215,7 @@ export default function BookingPage() {
         return (
             <AuthBookingForm 
                 selectedDate={selectedDate?.toISOString().split('T')[0]}
-                selectedTime={selectedTime ? new Date(`2000-01-01 ${selectedTime}`).toLocaleTimeString('en-US', {
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) : null}
+                selectedTime={selectedTime ? selectedTime : "Not Selected"}
                 onBack={() => {
                     setShowBookingForm(false);
                     setShowEntryChoice(false);
@@ -244,7 +234,7 @@ export default function BookingPage() {
         return (
             <BookingEntryChoice 
                 selectedDate={selectedDate?.toISOString().split('T')[0] || ''}
-                selectedTime={selectedTime}
+                selectedTime={selectedTime ? selectedTime: "Not Selected"}
                 onBack={() => setShowEntryChoice(false)}
                 showBookingForm={showBookingForm}
                 setShowBookingForm={setShowBookingForm}
@@ -269,7 +259,7 @@ export default function BookingPage() {
                                     <FiChevronLeft className="w-5 h-5" />
                                 </button>
                                 <h2 className="text-xl font-semibold">
-                                    {formatDate(currentMonth)}
+                                    {dayjs(currentMonth).format("MMM YYYY")}
                                 </h2>
                                 <button 
                                     onClick={handleNextMonth}
