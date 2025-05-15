@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabase/supabaseClient';
+import dayjs from 'dayjs';
 
 
 
@@ -21,13 +22,6 @@ const GuestAppointments  = ({guestAppointments}) => {
             hour12: true 
         });
   };
-    const formatDate = (date) => {
-      return new Date(date).toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric'
-      });
-    };
-
     const getCurrentAppointmentId = (e) => {
       const parent = e.target.closest("[data-id]");
       const appointmentId = parseInt(parent.dataset.id, 10);
@@ -115,7 +109,7 @@ const GuestAppointments  = ({guestAppointments}) => {
                       return(
                   <tr key={index} data-id={appointment.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="font-medium text-gray-900">{formatDate(appointment.date)}</div>
+                      <div className="font-medium text-gray-900">{dayjs(appointment.date).format("MMM DD")}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="text-gray-500">{formatTime(appointment.start_time)}-{formatTime(appointment.end_time)}</div>
@@ -180,7 +174,7 @@ const GuestAppointments  = ({guestAppointments}) => {
               <div className="space-y-3">
                 <div>
                   <div className="text-sm font-medium text-gray-900">Date</div>
-                  <div className="text-gray-900">{formatDate(appointment.date)}</div>
+                  <div className="text-gray-900">{dayjs(appointment.date).format("MMM DD")}</div>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-gray-900">Time</div>
@@ -207,11 +201,11 @@ const GuestAppointments  = ({guestAppointments}) => {
                 </div>
                 
                 <div className="pt-3 flex gap-3">
-                  <button 
+                  {/* <button 
                     className="flex-1 bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Reschedule
-                  </button>
+                  </button> */}
                   <button 
                     className="flex-1 bg-white text-red-600 px-4 py-2 rounded-md text-sm font-medium border border-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >

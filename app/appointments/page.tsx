@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../utils/supabase/supabaseClient';
 import { useRouter } from 'next/navigation';
-
+import dayjs from 'dayjs';
 
 
 const AppointmentView  = () => {
+  
   const auth = useAuth();
   const router = useRouter()
   const [message, setMessage] = useState("")
@@ -88,12 +89,6 @@ const AppointmentView  = () => {
             hour12: true 
         });
   };
-    const formatDate = (date) => {
-      return new Date(date).toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric'
-      });
-    };
 
     const getCurrentAppointmentId = (e) => {
       const parent = e.target.closest("[data-id]");
@@ -193,7 +188,7 @@ const AppointmentView  = () => {
                       return(
                   <tr key={index} data-id={appointment.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="font-medium text-gray-900">{formatDate(appointment.date)}</div>
+                      <div className="font-medium text-gray-900">{dayjs(appointment.date).format("MMM DD")}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="text-gray-500">{formatTime(appointment.start_time)}-{formatTime(appointment.end_time)}</div>
@@ -258,7 +253,7 @@ const AppointmentView  = () => {
               <div className="space-y-3">
                 <div>
                   <div className="text-sm font-medium text-gray-900">Date</div>
-                  <div className="text-gray-900">{formatDate(appointment.date)}</div>
+                  <div className="text-gray-900">{dayjs(appointment.date).format("MMM DDD")}</div>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-gray-900">Time</div>
