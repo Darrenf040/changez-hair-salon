@@ -9,11 +9,7 @@ import BookingEntryChoice from '../components/booking/BookingEntryChoice';
 import { useAuth } from '../context/AuthContext';
 import AuthBookingForm from '../components/booking/AuthBookingForm';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import localizedFormat from 'dayjs/plugin/localizedFormat'
 
-dayjs.extend(customParseFormat)
-dayjs.extend(localizedFormat)
 
 
 export default function BookingPage() {
@@ -45,6 +41,7 @@ export default function BookingPage() {
     }, [selectedDate]);
 
     useEffect(() => {
+        console.log("from book page: ", selectedTime)
         const fetchTimeSlots = async () => {
             // when selected is null or not selected by user do nothing
             if (!selectedDate) return;
@@ -123,7 +120,6 @@ export default function BookingPage() {
                     while (current < end) {
                         //format current time to 12 hour format
                         const timeString = formatter.format(current);
-                        console.log(timeString)
                         const currentTimeInMinutes = getTimeInMinutes(current);
           
                         let isBooked = false;
@@ -201,7 +197,7 @@ export default function BookingPage() {
         return (
             <BookingForm 
                 selectedDate={selectedDate?.toISOString().split('T')[0]}
-                selectedTime={selectedTime ? dayjs(selectedTime, "HH:mm").format('LT'): null}
+                selectedTime={selectedTime ? selectedTime: "Not Selected"}
                 onBack={() => {
                     setShowBookingForm(false);
                     setShowEntryChoice(true);
@@ -219,11 +215,7 @@ export default function BookingPage() {
         return (
             <AuthBookingForm 
                 selectedDate={selectedDate?.toISOString().split('T')[0]}
-                selectedTime={selectedTime ? new Date(`2000-01-01 ${selectedTime}`).toLocaleTimeString('en-US', {
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) : null}
+                selectedTime={selectedTime ? selectedTime : "Not Selected"}
                 onBack={() => {
                     setShowBookingForm(false);
                     setShowEntryChoice(false);
@@ -242,7 +234,7 @@ export default function BookingPage() {
         return (
             <BookingEntryChoice 
                 selectedDate={selectedDate?.toISOString().split('T')[0] || ''}
-                selectedTime={selectedTime}
+                selectedTime={selectedTime ? selectedTime: "Not Selected"}
                 onBack={() => setShowEntryChoice(false)}
                 showBookingForm={showBookingForm}
                 setShowBookingForm={setShowBookingForm}

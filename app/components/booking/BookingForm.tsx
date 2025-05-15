@@ -37,6 +37,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
 
     useEffect(() => {
         setIsLoading(true)
+        console.log("from booking form: ", selectedTime)
         const fetchServices = async () => {
             try {
                 const { data, error } = await supabase
