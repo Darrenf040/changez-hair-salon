@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { AiFillGoogleCircle } from 'react-icons/ai'
 import { FiPhone, FiMail, FiMapPin, FiInstagram, FiFacebook } from 'react-icons/fi'
 
@@ -62,10 +63,10 @@ export default function Footer() {
           <div className='w-max'>
             <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="/services" className="hover:text-accent transition-colors">Services</a></li>
-              <li><a href="/book" className="hover:text-accent transition-colors">Book Appointment</a></li>
-              <li><a href="/about" className="hover:text-accent transition-colors">About Us</a></li>
-              <li><a href="/contact" className="hover:text-accent transition-colors">Contact</a></li>
+              <li><Link href="/services" className="hover:text-accent transition-colors">Services</Link></li>
+              <li><Link href="/book" className="hover:text-accent transition-colors">Book Appointment</Link></li>
+              <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
             </ul>
           </div>
         </div>

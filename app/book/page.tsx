@@ -8,6 +8,7 @@ import BookingForm from '../components/booking/BookingForm';
 import BookingEntryChoice from '../components/booking/BookingEntryChoice';
 import { useAuth } from '../context/AuthContext';
 import AuthBookingForm from '../components/booking/AuthBookingForm';
+import dayjs from 'dayjs';
 
 export default function BookingPage() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -19,6 +20,7 @@ export default function BookingPage() {
     const [showAuthBookingForm, setShowAuthBookingForm] = useState(false);
     const [showEntryChoice, setShowEntryChoice] = useState(false);
     const { isAuthenticated } = useAuth();
+
 
     useEffect(() => {
         const fetchSalonHours = async () => {
@@ -188,13 +190,6 @@ export default function BookingPage() {
         return date < today;
     };
 
-    const formatDate = (date: Date) => {
-        return new Intl.DateTimeFormat('en-US', { 
-            month: 'long',
-            year: 'numeric'
-        }).format(date);
-    };
-
     if (showBookingForm) {
         return (
             <BookingForm 
@@ -269,7 +264,7 @@ export default function BookingPage() {
                                     <FiChevronLeft className="w-5 h-5" />
                                 </button>
                                 <h2 className="text-xl font-semibold">
-                                    {formatDate(currentMonth)}
+                                    {dayjs(currentMonth).format("MMM YYYY")}
                                 </h2>
                                 <button 
                                     onClick={handleNextMonth}
