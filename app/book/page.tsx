@@ -8,12 +8,15 @@ import BookingForm from '../components/booking/BookingForm';
 import BookingEntryChoice from '../components/booking/BookingEntryChoice';
 import { useAuth } from '../context/AuthContext';
 import AuthBookingForm from '../components/booking/AuthBookingForm';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
+// Register the plugin
+dayjs.extend(customParseFormat);
 
 
 export default function BookingPage() {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
     const [selectedTime, setSelectedTime] = useState<string>("");
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [salonHours, setSalonHours] = useState<Hours[]>([]);
@@ -22,6 +25,11 @@ export default function BookingPage() {
     const [showAuthBookingForm, setShowAuthBookingForm] = useState(false);
     const [showEntryChoice, setShowEntryChoice] = useState(false);
     const { isAuthenticated } = useAuth();
+
+        // format date func ex: 2025-02-22
+        const formatDate = (date: Dayjs) => {
+            return date.format("YYYY-MM-DD")
+        }
 
 
     useEffect(() => {
@@ -38,14 +46,28 @@ export default function BookingPage() {
         };
 
         fetchSalonHours();
-    }, [selectedDate]);
+    }, []);
 
     useEffect(() => {
-        console.log("from book page: ", selectedTime)
         const fetchTimeSlots = async () => {
             // when selected is null or not selected by user do nothing
             if (!selectedDate) return;
 
+        
+            const selectedDateFormatted = formatDate(selectedDate)
+              // Helper function to convert 24hr format time to total time in minutes
+              const getTimeInMinutes = (time: string): number => {
+                try {
+                    // Split the time string into hours, minutes
+                    const [hours, minutes] = time.split(':').map(Number);
+                    
+                    // Calculate total minutes
+                    return (hours * 60) + minutes;
+                } catch (error) {
+                    console.error('Error parsing time:', error);
+                    return 0; // or handle error as needed
+                }
+            };
             try {
 
                 //fetches all the booked appointments for the selected date
@@ -53,28 +75,25 @@ export default function BookingPage() {
                     .from('appointments')
                     .select('start_time, date, end_time')
                     .eq('status', 'booked')
-                    .eq('date', selectedDate.toISOString().split('T')[0])
+                    .eq('date', selectedDateFormatted)
                 if (error){
                     console.error(error)
                     return;
                 }
 
                 // create a date instance for each time
-                const bookedAppointments: {start:Date, end: Date}[] = data.map(appt =>(
+                const bookedAppointments: {start:number, end: number}[] = data.map(appt =>(
                     {
-                        start: new Date(`${appt.date} ${appt.start_time}`),
-                        end: new Date(`${appt.date} ${appt.end_time}`),
+                        start: getTimeInMinutes(appt.start_time),
+                        end: getTimeInMinutes(appt.end_time),
                     }
                 )
                 );
-                // Helper function to convert Date to minutes since midnight
-                const getTimeInMinutes = (date: Date) => {
-                    return date.getHours() * 60 + date.getMinutes();
-                };
-            
+
+              
 
                 // Get day of week from selected date
-                const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+                const dayOfWeek = dayjs(selectedDate).format("dddd");
                 
                 // Find salon hours for selected day
                 const todayHours = salonHours.find(h => h.day_of_week === dayOfWeek);
@@ -85,59 +104,50 @@ export default function BookingPage() {
                     const times: string[] = [];
                     
                     //start time and end time are in 24 hour format
-                    const selectedDateStr = selectedDate.toISOString().split('T')[0];
-                    const start = new Date(`${selectedDateStr} ${todayHours.start_time}`);
-                    const end = new Date(`${selectedDateStr} ${todayHours.end_time}`);
+                    let startTime = getTimeInMinutes(todayHours.start_time);
+                    const endTime = getTimeInMinutes(todayHours.end_time);
                     
-                    let current = new Date(start);
 
                     // Check if selected date is today
-                    const now = new Date();
-                    const isToday = selectedDate.toDateString() === now.toDateString();
+                    const now = dayjs();
+                    const isToday = formatDate(selectedDate) === formatDate(now);
                     
                     // If it's today, adjust the start time to the next available 30-minute slot
-                    if (isToday ) {
+                    if (isToday) {
                         //caclulate current time 
-                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-                        const nextSlotMinutes = Math.ceil(currentMinutes / 30) * 30;
-                        const time = new Date(`${selectedDateStr} ${Math.floor(nextSlotMinutes / 60).toString().padStart(2, '0')}:${(nextSlotMinutes % 60).toString().padStart(2, '0')}`);
-                        const currentTime = getTimeInMinutes(time)
+                        const currentMinutes = now.hour() * 60 + now.minute();
 
-                        // current time is past the days store hours
-                        if(currentTime >= getTimeInMinutes(current)){
-                            current = time;
+                        // current time is past the days salon hours
+                        if(currentMinutes >= getTimeInMinutes(todayHours.start_time) ){
+                            startTime = Math.ceil(currentMinutes / 30) * 30;
+                        } else if(currentMinutes >= getTimeInMinutes(todayHours.end_time)){ // the salon is closed at this point
+                            return
                         }
                     }
 
-                    //time slot formatter
-                    const formatter = Intl.DateTimeFormat('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    });
-     
-
-                    while (current < end) {
+                    while (startTime < endTime) {
                         //format current time to 12 hour format
-                        const timeString = formatter.format(current);
-                        const currentTimeInMinutes = getTimeInMinutes(current);
+                        // Create a dayjs object representing the time
+                        const time = dayjs().startOf('day').add(startTime, 'minutes');
+
+                        // Format the time as desired
+                        const formattedTime = time.format('h:mm A'); // Example: "9:30 AM"
+
           
                         let isBooked = false;
                         bookedAppointments.forEach(appointment => {
-                            const startMinutes = getTimeInMinutes(appointment.start);
-                            const endMinutes = getTimeInMinutes(appointment.end);
                             
-                            if (currentTimeInMinutes >= startMinutes && currentTimeInMinutes < endMinutes) {
+                            if (startTime >= appointment.start && startTime < appointment.end) {
                                 isBooked = true;
                             }
                         });
                         
                         if (!isBooked) {
-                            times.push(timeString);
+                            times.push(formattedTime);
                         }
                         
-                        // Add 30 minutes
-                        current.setMinutes(current.getMinutes() + 30);
+                        // Add 30 minutes to start time
+                        startTime += 30
                     }
                     setAvailableTimes(times);
                 } else {
@@ -196,8 +206,8 @@ export default function BookingPage() {
     if (showBookingForm) {
         return (
             <BookingForm 
-                selectedDate={selectedDate?.toISOString().split('T')[0]}
-                selectedTime={selectedTime ? selectedTime: "Not Selected"}
+            selectedDate={selectedDate ? formatDate(selectedDate): "Not Selected"}
+            selectedTime={selectedTime ? selectedTime: "Not Selected"}
                 onBack={() => {
                     setShowBookingForm(false);
                     setShowEntryChoice(true);
@@ -214,7 +224,7 @@ export default function BookingPage() {
     if(showAuthBookingForm){
         return (
             <AuthBookingForm 
-                selectedDate={selectedDate?.toISOString().split('T')[0]}
+                selectedDate={selectedDate ? formatDate(selectedDate): "Not Selected"}
                 selectedTime={selectedTime ? selectedTime : "Not Selected"}
                 onBack={() => {
                     setShowBookingForm(false);
@@ -233,7 +243,7 @@ export default function BookingPage() {
     if (showEntryChoice) {
         return (
             <BookingEntryChoice 
-                selectedDate={selectedDate?.toISOString().split('T')[0] || ''}
+                selectedDate={selectedDate ? formatDate(selectedDate): "Not Selected"}
                 selectedTime={selectedTime ? selectedTime: "Not Selected"}
                 onBack={() => setShowEntryChoice(false)}
                 showBookingForm={showBookingForm}
@@ -283,13 +293,13 @@ export default function BookingPage() {
                                         {date && (
                                             <button
                                                 onClick={() => {
-                                                    setSelectedDate(date)
+                                                    setSelectedDate(dayjs(date))
                                                     setSelectedTime("")
                                                 }}
                                                 disabled={isPastDate(date)}
                                                 className={`w-full h-full flex items-center justify-center rounded-lg text-sm transition-all duration-200
                                                     ${isPastDate(date) ? 'text-gray-300 cursor-not-allowed' :
-                                                    selectedDate?.getTime() === date.getTime() ? 'bg-accent text-primary font-medium' :
+                                                    selectedDate?.valueOf() === date.getTime() ? 'bg-accent text-primary font-medium' :
                                                     isToday(date) ? 'bg-primary/10 text-primary font-medium ring-1 ring-primary/20' : 
                                                     'hover:bg-gray-50'}`}
                                             >
@@ -308,7 +318,7 @@ export default function BookingPage() {
                                 Available Times
                                 {selectedDate && (
                                     <span className="ml-2 text-sm font-normal text-gray-500">
-                                        for {selectedDate.toLocaleDateString()}
+                                        for {selectedDate.format("MMMM DD")}
                                     </span>
                                 )}
                             </h3>
