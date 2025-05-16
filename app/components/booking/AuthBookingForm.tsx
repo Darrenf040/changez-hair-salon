@@ -142,6 +142,7 @@ export default function AuthBookingForm({ selectedDate, selectedTime, onBack, on
             // Create a dayjs object representing the time
             const newTime = dayjs().hour(hours).minute(minutes).second(0);
 
+            const endTimeBookingDetails = newTime.format("h:mm A")
 
             // use our new calculated time and format it
             const formattedEndTime = newTime.format("HH:mm:ss")
@@ -194,7 +195,7 @@ export default function AuthBookingForm({ selectedDate, selectedTime, onBack, on
                 phone: userData?.phone,
                 date: selectedDate,
                 startTime: selectedTime,
-                endTime: formattedEndTime,
+                endTime: endTimeBookingDetails,
                 services: selectedServiceDetails,
                 notes: formData.notes,
                 totalPrice: calculateTotal(),
