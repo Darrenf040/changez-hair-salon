@@ -34,7 +34,7 @@ export default function BookingConfirmation({ bookingDetails, onClose, isAuth }:
                 <div className="p-6">
                     <div className="text-center mb-6">
                         <h2 className="text-2xl font-bold text-primary mb-2">Booking Confirmed!</h2>
-                        <p className="text-gray-600">Thank you for booking with us. We've sent a confirmation email to {bookingDetails.email}</p>
+                        <p className="text-gray-600">Thank you for booking with us.</p>
                     </div>
 
                     <div className="space-y-6">
