@@ -6,6 +6,7 @@ import { supabase } from '../../utils/supabase/supabaseClient';
 import { Service } from '../../types/services';
 import BookingConfirmation from './BookingConfirmation';
 import { useAuth } from '../../context/AuthContext';
+import dayjs from 'dayjs';
 
 interface AuthBookingFormProps {
     selectedDate: string | null;  // YYYY-MM-DD format
@@ -131,14 +132,19 @@ export default function AuthBookingForm({ selectedDate, selectedTime, onBack, on
                 throw new Error('User not authenticated');
             }
 
-            // Calculate end time based on duration
-            const endTime = new Date(`2000-01-01 ${selectedTime}`);
-            endTime.setMinutes(endTime.getMinutes() + calculateDuration());
-            const formattedEndTime = endTime.toLocaleTimeString('en-US', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            // converts time to 12 hour format -- 4:pm
+            const time = dayjs(selectedTime, "h:mm A");
+            const endTime = (time.hour() * 60 + time.minute()) + calculateDuration(); // converts time into a number and adds our duration
+
+            const hours = Math.floor(endTime / 60);
+            const minutes = endTime % 60;
+
+            // Create a dayjs object representing the time
+            const newTime = dayjs().hour(hours).minute(minutes).second(0);
+
+
+            // use our new calculated time and format it
+            const formattedEndTime = newTime.format("HH:mm:ss")
 
             // Create appointment
             const { data: appointmentData, error: appointmentError } = await supabase
@@ -248,18 +254,16 @@ export default function AuthBookingForm({ selectedDate, selectedTime, onBack, on
 
                         <div className="mb-6">
                             <p className="text-sm text-gray-600">
-                                Selected Date: <span className="font-medium">{new Intl.DateTimeFormat("en-US", {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric"
-                                }).format(new Date(selectedDate + 'T00:00:00'))}</span>
+                                Selected Date:                             
+                                <span className="font-medium">
+                                    {selectedDate ? dayjs(selectedDate).format("MMM DD YYYY"): "Not selected"}
+                                </span>
+
                             </p>
                             <p className="text-sm text-gray-600">
-                                Selected Time: <span className="font-medium">{new Intl.DateTimeFormat("en-US", {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                }).format(new Date(`1970-01-01T${selectedTime}:00`))}</span>
+                            <span className="font-medium">
+                                {selectedTime ? selectedTime: "Not selected"}
+                            </span>
                             </p>
                         </div>
 
