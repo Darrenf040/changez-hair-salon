@@ -37,7 +37,7 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
 
     useEffect(() => {
         setIsLoading(true)
-        console.log("from booking form: ", selectedTime)
+
         const fetchServices = async () => {
             try {
                 const { data, error } = await supabase
@@ -119,14 +119,19 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
                 throw new Error('Please select at least one service');
             }
 
-            // Calculate end time based on duration
-            const endTime = new Date(`2000-01-01 ${selectedTime}`);
-            endTime.setMinutes(endTime.getMinutes() + calculateDuration());
-            const formattedEndTime = endTime.toLocaleTimeString('en-US', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            // converts time to 12 hour format -- 4:pm
+            const time = dayjs(selectedTime, "h:mm A");
+            const endTime = (time.hour() * 60 + time.minute()) + calculateDuration(); // converts time into a number and adds our duration
+
+            const hours = Math.floor(endTime / 60);
+            const minutes = endTime % 60;
+
+            // Create a dayjs object representing the time
+            const newTime = dayjs().hour(hours).minute(minutes).second(0);
+
+
+            // use our new calculated time and format it
+            const formattedEndTime = newTime.format("HH:mm:ss")
 
             // Start a transaction
             const { data: customerData, error: customerError } = await supabase
@@ -260,7 +265,8 @@ export default function BookingForm({ selectedDate, selectedTime, onBack, onSucc
                             </p>
 
                             <p className="text-sm text-gray-600">
-                            Selected Time: <span className="font-medium">
+                            Selected Time: 
+                            <span className="font-medium">
                                 {selectedTime ? selectedTime: "Not selected"}
                             </span>
                             </p>
