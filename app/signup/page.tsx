@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../context/AuthContext'
 import { SignUpData, AuthError } from '../types/auth'
+import { supabase } from '../utils/supabase/supabaseClient'
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState<SignUpData>({
@@ -23,12 +24,24 @@ export default function SignUpPage() {
     setIsLoading(true)
 
     try {
-      await signUp(formData.email, formData.password, formData.full_name, formData.phone)
+      const signUpData = await signUp(formData.email, formData.password, formData.full_name, formData.phone)
+
+      const { error} = await supabase.from("users").insert({
+        id: signUpData.user.id,
+        name: formData.full_name,
+        phone_number: formData.phone,
+        email: formData.email
+      })
+      if(error){
+        console.error(error);
+        setError({message: "Failed to save account details"})
+      }
       router.push('/profile')
     } catch (err) {
       setError({
-        message: err instanceof Error ? err.message : 'Failed to create account',
+        message:'Failed to create account',
       })
+      console.error(err)
     } finally {
       setIsLoading(false)
     }

@@ -11,8 +11,11 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean; // Add isLoading to the interface
     signIn: (email: string, password: string) => Promise<void>;
-    signUp: (email: string, password: string, full_name: string, phone?: string) => Promise<void>;
-    signOut: () => Promise<void>;
+    signUp: (email: string, password: string, full_name: string, phone?: string) => Promise<{
+        user: User | null;
+        session: Session | null;
+    } | null>;
+        signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,7 +24,7 @@ const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     isLoading: true, // Default to true since we're loading on init
     signIn: async () => {},
-    signUp: async () => {},
+    signUp: async () => null,
     signOut: async () => {},
 });
 
@@ -89,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }
             });
             if (error) throw error;
+            return data
         } finally {
             setIsLoading(false); // Set loading to false when done
         }

@@ -49,6 +49,36 @@ const OneTapComponent = () => {
                 nonce: nonce,
               })
 
+              // look for existing user
+              const {data: userData, error: userError} = await supabase
+              .from("users")
+              .select("*")
+              .eq("id", data.user.id)
+              .single()
+
+              if (userError && userError.code !== 'PGSQL_ERROR_NO_DATA_FOUND') {
+                console.error('Error checking profile:', userError)
+              }
+
+
+              // new user 
+              if(!userData){
+
+                const { error: insertError } = await supabase
+                .from('users')
+                .insert({
+                  id: data.user.id,
+                  email: data.user.email,
+                  name: data.user.user_metadata.full_name || '',
+                  phone_number: data.user.phone
+                })
+                if (insertError) {
+                  console.error('Error creating profile:', insertError)
+                }
+              }
+
+              
+
               if (error) {
                 console.error('Supabase auth error:', error)
                 throw error
